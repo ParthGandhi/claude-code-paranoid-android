@@ -49,10 +49,18 @@ Only 4 functional files (plus README and LICENSE).
 
 **Cache directory** (`~/.cache/claude-code-marvin/`):
 ```
-state.json          # {"quote": "...", "generated_at": 1705412345}
-generation.lock     # Lock file during generation
-marvin.log          # Simple append-only log file for debugging
+sessions/
+├── [session-id-1]/     # Derived from md5 of transcript_path (12 chars)
+│   ├── state.json      # {"quote": "...", "generated_at": 1705412345}
+│   ├── generation.lock # Lock file during generation
+│   └── marvin.log      # Per-session log file for debugging
+├── [session-id-2]/
+│   └── ...
+└── default/            # Fallback when no transcript_path available
+    └── ...
 ```
+
+**Per-session isolation**: Each Claude Code instance has a unique `transcript_path`. We derive a 12-character session ID from its MD5 hash to create isolated cache directories. This prevents race conditions when multiple Claude instances run simultaneously.
 
 ## Implementation Steps
 
@@ -157,6 +165,8 @@ curl -fsSL https://raw.githubusercontent.com/USER/claude-code-marvin/main/uninst
 **Dim cyan italic** (`\033[2;3;36m`): Muted, robotic, slightly sad - perfectly captures Marvin's perpetually underwhelmed demeanor.
 
 Reset code: `\033[0m`
+
+**Display safety**: Use `printf '%s'` instead of `echo -e` to output quotes. This prevents escape sequences in the quote content (like `\n`) from being interpreted, which would break ANSI styling mid-string.
 
 ## Configuration Options
 
@@ -274,3 +284,6 @@ cd "$TEST_DIR" && claude
 - [x] Create `uninstall.sh` - Clean removal script
 - [x] Create `README.md` - Documentation with install/uninstall commands and usage
 - [x] Create `LICENSE` - MIT license
+- [x] Per-session isolation - Derive session ID from transcript_path, create per-session cache directories
+- [x] Display fix - Use printf instead of echo -e to prevent escape sequence interpretation in quotes
+- [x] Quote cleanup - Remove all control characters including \r and \0-\037 range

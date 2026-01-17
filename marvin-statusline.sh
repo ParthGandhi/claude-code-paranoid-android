@@ -36,6 +36,15 @@ INPUT=$(cat)
 # Extract transcript_path from input JSON
 TRANSCRIPT_PATH=$(echo "$INPUT" | jq -r '.transcript_path // empty' 2>/dev/null || true)
 
+# Derive session ID from transcript path (unique per Claude instance)
+if [[ -n "$TRANSCRIPT_PATH" ]]; then
+    SESSION_ID=$(echo "$TRANSCRIPT_PATH" | md5sum 2>/dev/null | cut -c1-12 || echo "$TRANSCRIPT_PATH" | md5 2>/dev/null | cut -c1-12 || echo "default")
+else
+    SESSION_ID="default"
+fi
+SESSION_CACHE_DIR="$MARVIN_CACHE_DIR/sessions/$SESSION_ID"
+mkdir -p "$SESSION_CACHE_DIR"
+
 # Function to get a random fallback quote
 get_fallback_quote() {
     local idx=$((RANDOM % ${#FALLBACK_QUOTES[@]}))
@@ -44,7 +53,7 @@ get_fallback_quote() {
 
 # Function to read cached quote
 get_cached_quote() {
-    local state_file="$MARVIN_CACHE_DIR/state.json"
+    local state_file="$SESSION_CACHE_DIR/state.json"
 
     if [[ -f "$state_file" ]]; then
         local quote
@@ -61,8 +70,8 @@ get_cached_quote() {
 
 # Function to check if generation should be triggered
 should_generate() {
-    local state_file="$MARVIN_CACHE_DIR/state.json"
-    local lock_file="$MARVIN_CACHE_DIR/generation.lock"
+    local state_file="$SESSION_CACHE_DIR/state.json"
+    local lock_file="$SESSION_CACHE_DIR/generation.lock"
 
     # Don't generate if lock exists (generation in progress)
     if [[ -f "$lock_file" ]]; then
@@ -97,15 +106,16 @@ spawn_generator() {
 
     if [[ -x "$generator_script" ]]; then
         # Spawn in background with nohup, redirect all output
-        nohup "$generator_script" "$TRANSCRIPT_PATH" > /dev/null 2>&1 &
+        # Pass both transcript path and session ID
+        nohup "$generator_script" "$TRANSCRIPT_PATH" "$SESSION_ID" > /dev/null 2>&1 &
     fi
 }
 
 # Main execution
 QUOTE=$(get_cached_quote)
 
-# Output styled quote
-echo -e "${STYLE_START}${QUOTE}${STYLE_END}"
+# Output styled quote using printf to prevent escape sequence interpretation in quote content
+printf '\033[2;3;36m%s\033[0m\n' "$QUOTE"
 
 # Check if we should trigger generation
 if should_generate; then

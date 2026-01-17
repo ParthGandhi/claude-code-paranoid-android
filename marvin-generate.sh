@@ -7,13 +7,20 @@ set -e
 # Configuration (can be overridden via environment variables)
 MARVIN_CACHE_DIR="${MARVIN_CACHE_DIR:-$HOME/.cache/claude-code-marvin}"
 
-# Files
-STATE_FILE="$MARVIN_CACHE_DIR/state.json"
-LOCK_FILE="$MARVIN_CACHE_DIR/generation.lock"
-LOG_FILE="$MARVIN_CACHE_DIR/marvin.log"
+# Get transcript path and session ID from arguments
+TRANSCRIPT_PATH="$1"
+SESSION_ID="${2:-default}"
 
-# Ensure cache directory exists
-mkdir -p "$MARVIN_CACHE_DIR"
+# Per-session cache directory
+SESSION_CACHE_DIR="$MARVIN_CACHE_DIR/sessions/$SESSION_ID"
+
+# Files (per-session)
+STATE_FILE="$SESSION_CACHE_DIR/state.json"
+LOCK_FILE="$SESSION_CACHE_DIR/generation.lock"
+LOG_FILE="$SESSION_CACHE_DIR/marvin.log"
+
+# Ensure session cache directory exists
+mkdir -p "$SESSION_CACHE_DIR"
 
 # Logging function
 log() {
@@ -27,9 +34,6 @@ cleanup() {
     rm -f "$LOCK_FILE"
 }
 trap cleanup EXIT
-
-# Get transcript path from argument
-TRANSCRIPT_PATH="$1"
 
 if [[ -z "$TRANSCRIPT_PATH" ]]; then
     log "Error: No transcript path provided"
@@ -50,7 +54,7 @@ fi
 # Create lock file
 echo $$ > "$LOCK_FILE"
 
-log "Starting generation from transcript: $TRANSCRIPT_PATH"
+log "Starting generation (session: $SESSION_ID) from transcript: $TRANSCRIPT_PATH"
 
 # Extract last ~5 user messages from JSONL transcript
 # User messages have "role":"user" and content can be string or array
@@ -112,8 +116,9 @@ if [[ -z "$QUOTE" ]]; then
     exit 1
 fi
 
-# Clean up the quote (remove any leading/trailing whitespace and quotes)
-QUOTE=$(echo "$QUOTE" | tr -d '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//')
+# Clean up the quote: remove all line endings (Unix, Mac, Windows) and control characters
+# Then trim whitespace and remove surrounding quotes
+QUOTE=$(echo "$QUOTE" | tr -d '\n\r' | tr -d '\000-\037' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//')
 
 # Truncate if too long
 if [[ ${#QUOTE} -gt 100 ]]; then
@@ -124,7 +129,7 @@ log "Generated quote: $QUOTE"
 
 # Write to state file atomically (write to temp, then move)
 CURRENT_TIME=$(date +%s)
-TEMP_FILE="$MARVIN_CACHE_DIR/state.json.tmp"
+TEMP_FILE="$SESSION_CACHE_DIR/state.json.tmp"
 
 # Create JSON with proper escaping
 jq -n --arg quote "$QUOTE" --argjson time "$CURRENT_TIME" \
