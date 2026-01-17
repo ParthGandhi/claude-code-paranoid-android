@@ -1,5 +1,5 @@
 #!/bin/bash
-# paranoid-android-statusline.sh - Main entry point for Paranoid Android status line
+# statusline.sh - Main entry point for Paranoid Android status line
 # Displays cached quote and triggers background generation when rate limit allows
 
 set -e
@@ -107,7 +107,7 @@ should_generate() {
 
 # Function to spawn generator in background
 spawn_generator() {
-    local generator_script="$SCRIPT_DIR/paranoid-android-generate.sh"
+    local generator_script="$SCRIPT_DIR/generate.sh"
 
     if [[ -x "$generator_script" ]]; then
         # Spawn in background with nohup, redirect all output

@@ -6,12 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Claude Code Paranoid Android is a status line extension that displays Marvin the Paranoid Android quotes. It uses a two-script architecture for non-blocking operation:
 
-1. **paranoid-android-statusline.sh** - Fast display script (called every ~300ms by Claude Code)
+1. **statusline.sh** - Fast display script (called every ~300ms by Claude Code)
    - Reads cached quote from `~/.cache/claude-code-paranoid-android/sessions/<session-id>/state.json`
    - Falls back to embedded quotes array if no cache
    - Spawns generator in background if rate limit allows (3 min default)
 
-2. **paranoid-android-generate.sh** - Background generator
+2. **generate.sh** - Background generator
    - Extracts last 5 user messages from Claude Code's JSONL transcript
    - Calls `claude --model haiku -p "..."` to generate contextual quote
    - Writes atomically to state.json with lock file protection
@@ -38,7 +38,7 @@ cat > "$TEST_DIR/.claude/settings.json" << 'EOF'
 {
   "statusLine": {
     "type": "command",
-    "command": "bash /path/to/this/repo/paranoid-android-statusline.sh"
+    "command": "bash /path/to/this/repo/statusline.sh"
   }
 }
 EOF
@@ -48,7 +48,7 @@ cd "$TEST_DIR" && claude
 
 Test the statusline directly:
 ```bash
-echo '{"transcript_path": "/tmp/test.jsonl"}' | ./paranoid-android-statusline.sh
+echo '{"transcript_path": "/tmp/test.jsonl"}' | ./statusline.sh
 ```
 
 Check logs:

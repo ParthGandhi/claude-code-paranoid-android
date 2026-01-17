@@ -41,8 +41,8 @@ claude-code-paranoid-android/
 ├── LICENSE                             # MIT license
 ├── install.sh                          # Installer (called by curl)
 ├── uninstall.sh                        # Clean removal (called by curl)
-├── paranoid-android-statusline.sh                # Main script (reads + triggers, includes fallback quotes)
-└── paranoid-android-generate.sh                  # Background generator
+├── statusline.sh                # Main script (reads + triggers, includes fallback quotes)
+└── generate.sh                  # Background generator
 ```
 
 Only 4 functional files (plus README and LICENSE).
@@ -68,7 +68,7 @@ sessions/
 
 ## Implementation Steps
 
-### 1. Create `paranoid-android-statusline.sh`
+### 1. Create `statusline.sh`
 **Purpose**: Main entry point - displays cached quote AND triggers background generation
 
 ```bash
@@ -102,14 +102,14 @@ Key logic:
 - Output quote with dim cyan italic ANSI styling
 - Check `generated_at` timestamp
 - If >3 minutes since last generation AND no lock file exists:
-  - Spawn `paranoid-android-generate.sh` in background with `nohup ... &`
+  - Spawn `generate.sh` in background with `nohup ... &`
   - Pass transcript_path to generator
 
 **Composable output**: Script outputs a styled string to stdout that can be used:
 - As the entire status line
 - As part of an existing status line script (call this script, capture output, combine)
 
-### 2. Create `paranoid-android-generate.sh`
+### 2. Create `generate.sh`
 **Purpose**: Background generator using Claude Code headless
 
 ```bash
@@ -186,7 +186,7 @@ Reset code: `\033[0m`
 {
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.claude-code-paranoid-android/paranoid-android-statusline.sh"
+    "command": "bash ~/.claude-code-paranoid-android/statusline.sh"
   }
 }
 ```
@@ -202,7 +202,7 @@ MODEL=$(echo "$input" | jq -r '.model.display_name')
 COST=$(echo "$input" | jq -r '.cost.total_cost_usd')
 
 # Add Paranoid Android quote (pass input JSON so it can trigger generation)
-PARANOID_ANDROID=$("$HOME/.claude-code-paranoid-android/paranoid-android-statusline.sh" <<< "$input")
+PARANOID_ANDROID=$("$HOME/.claude-code-paranoid-android/statusline.sh" <<< "$input")
 
 echo "[$MODEL] \$$COST | $PARANOID_ANDROID"
 ```
@@ -213,7 +213,7 @@ That's it - no hooks, no plugins. Just clone and configure.
 
 ## Embedded Paranoid Android Prompt
 
-Directly in `paranoid-android-generate.sh`:
+Directly in `generate.sh`:
 ```
 You are Marvin the Paranoid Android from Hitchhiker's Guide to the Galaxy.
 You are depressed, world-weary, with a brain the size of a planet but given trivial tasks.
@@ -256,7 +256,7 @@ cat > .claude/settings.json << 'EOF'
 {
   "statusLine": {
     "type": "command",
-    "command": "bash /path/to/claude-code-paranoid-android/paranoid-android-statusline.sh"
+    "command": "bash /path/to/claude-code-paranoid-android/statusline.sh"
   }
 }
 EOF

@@ -31,7 +31,7 @@ Then add to your `~/.claude/settings.json`:
 {
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.claude-code-paranoid-android/paranoid-android-statusline.sh"
+    "command": "bash ~/.claude-code-paranoid-android/statusline.sh"
   }
 }
 ```
@@ -50,7 +50,7 @@ MODEL=$(echo "$input" | jq -r '.model.display_name')
 COST=$(echo "$input" | jq -r '.cost.total_cost_usd')
 
 # Add Paranoid Android quote
-PARANOID_ANDROID=$("$HOME/.claude-code-paranoid-android/paranoid-android-statusline.sh" <<< "$input")
+PARANOID_ANDROID=$("$HOME/.claude-code-paranoid-android/statusline.sh" <<< "$input")
 
 echo "[$MODEL] \$$COST | $PARANOID_ANDROID"
 ```
@@ -100,7 +100,7 @@ The status line receives JSON with `transcript_path` every ~300ms. We use this t
 Test quote generation directly with debug mode:
 
 ```bash
-~/.claude-code-paranoid-android/paranoid-android-generate.sh --debug <transcript_path>
+~/.claude-code-paranoid-android/generate.sh --debug <transcript_path>
 ```
 
 This outputs the full prompt, timing info, and both raw and truncated quotes.

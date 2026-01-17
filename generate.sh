@@ -1,6 +1,6 @@
 #!/bin/bash
-# paranoid-android-generate.sh - Background generator for Paranoid Android quotes using Claude Haiku
-# Called by paranoid-android-statusline.sh when rate limit allows
+# generate.sh - Background generator for Paranoid Android quotes using Claude Haiku
+# Called by statusline.sh when rate limit allows
 
 set -e
 

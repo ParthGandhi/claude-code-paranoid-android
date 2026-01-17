@@ -37,8 +37,8 @@ git clone --depth 1 "$REPO_URL" "$INSTALL_DIR" 2>/dev/null || {
 }
 
 # Make scripts executable
-chmod +x "$INSTALL_DIR/paranoid-android-statusline.sh"
-chmod +x "$INSTALL_DIR/paranoid-android-generate.sh"
+chmod +x "$INSTALL_DIR/statusline.sh"
+chmod +x "$INSTALL_DIR/generate.sh"
 
 # Create cache directory
 mkdir -p "$HOME/.cache/claude-code-paranoid-android"
@@ -51,7 +51,7 @@ echo ""
 echo '  {'
 echo '    "statusLine": {'
 echo '      "type": "command",'
-echo '      "command": "bash ~/.claude-code-paranoid-android/paranoid-android-statusline.sh"'
+echo '      "command": "bash ~/.claude-code-paranoid-android/statusline.sh"'
 echo '    }'
 echo '  }'
 echo ""
