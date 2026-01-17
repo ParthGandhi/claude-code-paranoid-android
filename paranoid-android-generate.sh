@@ -79,13 +79,13 @@ fi
 
 log "Starting generation (session: $SESSION_ID) from transcript: $TRANSCRIPT_PATH"
 
-# Extract last ~5 user messages from JSONL transcript
+# Extract last ~10 user messages from JSONL transcript
 # User messages have "role":"user" and content can be string or array
 # Only extract string content (actual user-typed messages), filter meta/command messages
 extract_user_messages() {
     local transcript="$1"
 
-    # Extract string-content user messages, filter meta/commands, take last 5
+    # Extract string-content user messages, filter meta/commands, take last 10
     # .message.content contains the actual user input
     grep '"role":"user"' "$transcript" 2>/dev/null | jq -r '
         if .message.content | type == "string" then
@@ -93,7 +93,7 @@ extract_user_messages() {
         else
             ""
         end
-    ' 2>/dev/null | grep -v '^$' | grep -v '<command' | grep -v '^Caveat' | tail -5
+    ' 2>/dev/null | grep -v '^$' | grep -v '<command' | grep -v '^Caveat' | tail -10
 }
 
 USER_MESSAGES=$(extract_user_messages "$TRANSCRIPT_PATH")
