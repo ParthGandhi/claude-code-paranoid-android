@@ -6,7 +6,7 @@ set -e
 
 # Configuration (can be overridden via environment variables)
 MARVIN_CACHE_DIR="${MARVIN_CACHE_DIR:-$HOME/.cache/claude-code-marvin}"
-MARVIN_MIN_INTERVAL="${MARVIN_MIN_INTERVAL:-180}"  # 3 minutes default
+MARVIN_MIN_INTERVAL="${MARVIN_MIN_INTERVAL:-180}" # 3 minutes default
 
 # ANSI styling: dim cyan italic
 STYLE_START='\033[2;3;36m'
@@ -107,7 +107,7 @@ spawn_generator() {
     if [[ -x "$generator_script" ]]; then
         # Spawn in background with nohup, redirect all output
         # Pass both transcript path and session ID
-        nohup "$generator_script" "$TRANSCRIPT_PATH" "$SESSION_ID" > /dev/null 2>&1 &
+        nohup "$generator_script" "$TRANSCRIPT_PATH" "$SESSION_ID" >/dev/null 2>&1 &
     fi
 }
 
@@ -115,7 +115,7 @@ spawn_generator() {
 QUOTE=$(get_cached_quote)
 
 # Output styled quote using printf to prevent escape sequence interpretation in quote content
-printf '\033[2;3;36m%s\033[0m\n' "$QUOTE"
+printf '%b%s%b\n' "$STYLE_START" "$QUOTE" "$STYLE_END"
 
 # Check if we should trigger generation
 if should_generate; then

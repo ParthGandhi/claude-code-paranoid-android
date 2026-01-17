@@ -31,4 +31,4 @@ echo "Uninstallation complete!"
 echo ""
 echo "Don't forget to remove the statusLine configuration from your ~/.claude/settings.json"
 echo ""
-echo '"I'd say I'll miss you, but that would be a lie. I don't miss anything."'
+echo "\"I'd say I'll miss you, but that would be a lie. I don't miss anything.\""

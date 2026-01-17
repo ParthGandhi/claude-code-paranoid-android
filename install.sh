@@ -12,7 +12,7 @@ echo ""
 
 # Check for required dependencies
 check_dependency() {
-    if ! command -v "$1" &> /dev/null; then
+    if ! command -v "$1" &>/dev/null; then
         echo "Error: $1 is required but not installed."
         exit 1
     fi

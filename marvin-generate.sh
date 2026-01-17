@@ -26,7 +26,7 @@ mkdir -p "$SESSION_CACHE_DIR"
 log() {
     local timestamp
     timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    echo "[$timestamp] $1" >> "$LOG_FILE"
+    echo "[$timestamp] $1" >>"$LOG_FILE"
 }
 
 # Cleanup function to remove lock on exit
@@ -52,7 +52,7 @@ if [[ -f "$LOCK_FILE" ]]; then
 fi
 
 # Create lock file
-echo $$ > "$LOCK_FILE"
+echo $$ >"$LOCK_FILE"
 
 log "Starting generation (session: $SESSION_ID) from transcript: $TRANSCRIPT_PATH"
 
@@ -133,7 +133,7 @@ TEMP_FILE="$SESSION_CACHE_DIR/state.json.tmp"
 
 # Create JSON with proper escaping
 jq -n --arg quote "$QUOTE" --argjson time "$CURRENT_TIME" \
-    '{quote: $quote, generated_at: $time}' > "$TEMP_FILE"
+    '{quote: $quote, generated_at: $time}' >"$TEMP_FILE"
 
 mv "$TEMP_FILE" "$STATE_FILE"
 
