@@ -19,7 +19,7 @@ Give your [Claude Code status line](https://docs.anthropic.com/en/docs/claude-co
 
 > "I suppose being asked to generate a quote about generating quotes is what passes for irony these days."
 
-## Installation
+### Installation
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ParthGandhi/claude-code-paranoid-android/main/install.sh | bash
@@ -36,7 +36,7 @@ Then add to your `~/.claude/settings.json`:
 }
 ```
 
-### Composable Usage
+#### Composable Usage
 
 Already have a status line? Integrate Paranoid Android with your existing script:
 
@@ -55,7 +55,7 @@ PARANOID_ANDROID=$("$HOME/.claude-code-paranoid-android/paranoid-android-statusl
 echo "[$MODEL] \$$COST | $PARANOID_ANDROID"
 ```
 
-## Uninstallation
+### Uninstallation
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ParthGandhi/claude-code-paranoid-android/main/uninstall.sh | bash
@@ -63,7 +63,7 @@ curl -fsSL https://raw.githubusercontent.com/ParthGandhi/claude-code-paranoid-an
 
 Then remove the `statusLine` section from your `~/.claude/settings.json`.
 
-## Architecture
+### Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -88,14 +88,14 @@ The status line receives JSON with `transcript_path` every ~300ms. We use this t
 1. Always display the cached quote (fast, non-blocking)
 2. Opportunistically spawn the generator in background when rate limit allows
 
-## Configuration
+### Configuration
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PARANOID_ANDROID_CACHE_DIR` | `~/.cache/claude-code-paranoid-android` | Cache location |
 | `PARANOID_ANDROID_MIN_INTERVAL` | `60` (1 min) | Seconds between generations |
 
-## Debugging
+### Debugging
 
 Test quote generation directly with debug mode:
 
@@ -118,7 +118,7 @@ cat ~/.cache/claude-code-paranoid-android/sessions/*/paranoid-android.log
 cat ~/.cache/claude-code-paranoid-android/sessions/*/state.json
 ```
 
-## Requirements
+### Requirements
 
 - [Claude Code CLI](https://claude.ai/code) installed and authenticated
 - `jq` for JSON parsing
