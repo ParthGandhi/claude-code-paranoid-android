@@ -3,6 +3,7 @@
 > "Here I am, brain the size of a planet, and you want me to display status messages."
 
 Give your [Claude Code status line](https://docs.anthropic.com/en/docs/claude-code/settings#status-line) a personality.
+<img width="1066" height="219" alt="Screenshot 2026-01-17 at 10 25 14 AM" src="https://github.com/user-attachments/assets/d321c08b-31aa-4340-a2c7-8035c1ad3767" />
 
 ## Installation
 
