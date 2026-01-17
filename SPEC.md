@@ -1,4 +1,4 @@
-# Claude Code Marvin Android
+# Claude Code Paranoid Android
 
 > "Here I am, brain the size of a planet, and you want me to display status messages."
 
@@ -36,24 +36,24 @@ No hooks needed - the status line itself triggers generation.
 ## File Structure
 
 ```
-claude-code-marvin/
+claude-code-paranoid-android/
 ├── README.md                           # Installation & usage docs
 ├── LICENSE                             # MIT license
 ├── install.sh                          # Installer (called by curl)
 ├── uninstall.sh                        # Clean removal (called by curl)
-├── marvin-statusline.sh                # Main script (reads + triggers, includes fallback quotes)
-└── marvin-generate.sh                  # Background generator
+├── paranoid-android-statusline.sh                # Main script (reads + triggers, includes fallback quotes)
+└── paranoid-android-generate.sh                  # Background generator
 ```
 
 Only 4 functional files (plus README and LICENSE).
 
-**Cache directory** (`~/.cache/claude-code-marvin/`):
+**Cache directory** (`~/.cache/claude-code-paranoid-android/`):
 ```
 sessions/
 ├── [session-id-1]/     # Derived from md5 of transcript_path (12 chars)
 │   ├── state.json      # {"quote": "...", "generated_at": 1705412345}
 │   ├── generation.lock # Lock file during generation
-│   └── marvin.log      # Per-session log file for debugging
+│   └── paranoid-android.log      # Per-session log file for debugging
 ├── [session-id-2]/
 │   └── ...
 └── default/            # Fallback when no transcript_path available
@@ -68,7 +68,7 @@ sessions/
 
 ## Implementation Steps
 
-### 1. Create `marvin-statusline.sh`
+### 1. Create `paranoid-android-statusline.sh`
 **Purpose**: Main entry point - displays cached quote AND triggers background generation
 
 ```bash
@@ -79,7 +79,7 @@ sessions/
 ```
 
 Key logic:
-- Read from single JSON cache: `~/.cache/claude-code-marvin/state.json`
+- Read from single JSON cache: `~/.cache/claude-code-paranoid-android/state.json`
   ```json
   {
     "quote": "Here I am, brain the size of a planet...",
@@ -102,59 +102,59 @@ Key logic:
 - Output quote with dim cyan italic ANSI styling
 - Check `generated_at` timestamp
 - If >3 minutes since last generation AND no lock file exists:
-  - Spawn `marvin-generate.sh` in background with `nohup ... &`
+  - Spawn `paranoid-android-generate.sh` in background with `nohup ... &`
   - Pass transcript_path to generator
 
 **Composable output**: Script outputs a styled string to stdout that can be used:
 - As the entire status line
 - As part of an existing status line script (call this script, capture output, combine)
 
-### 2. Create `marvin-generate.sh`
+### 2. Create `paranoid-android-generate.sh`
 **Purpose**: Background generator using Claude Code headless
 
 ```bash
 #!/bin/bash
 # 1. Create lock file
 # 2. Read transcript, extract last ~5 user messages
-# 3. Call: claude --model haiku -p "..." with embedded Marvin prompt
+# 3. Call: claude --model haiku -p "..." with embedded Paranoid Android prompt
 # 4. Write quote + timestamp to JSON cache file
 # 5. Remove lock
 ```
 
 Key features:
-- **Lock file**: `~/.cache/claude-code-marvin/generation.lock` - prevents concurrent generations
+- **Lock file**: `~/.cache/claude-code-paranoid-android/generation.lock` - prevents concurrent generations
 - **Context extraction**: Parse JSONL transcript, grep for user messages, extract text
-- **Embedded prompt**: Marvin personality prompt directly in script
-- **Claude Code headless**: `claude --model haiku -p "Given this conversation: ... Generate a Marvin quote"`
+- **Embedded prompt**: Paranoid Android personality prompt directly in script
+- **Claude Code headless**: `claude --model haiku -p "Given this conversation: ... Generate a Paranoid Android quote"`
 - **JSON output**: Write both quote and timestamp atomically to `state.json`
-- **Logging**: Append to `~/.cache/claude-code-marvin/marvin.log` with timestamp for debugging
+- **Logging**: Append to `~/.cache/claude-code-paranoid-android/paranoid-android.log` with timestamp for debugging
   - Simple format: `[2024-01-16 14:30:00] Generated quote: "..."` or `[...] Error: ...`
   - Uses `date` and file append (`>>`), available on all Linux/macOS
 
 ### 3. Create `install.sh`
 ```bash
 #!/bin/bash
-# Downloads repo to ~/.claude-code-marvin/
+# Downloads repo to ~/.claude-code-paranoid-android/
 # Makes scripts executable
 # Prints instructions for settings.json update
 ```
 
 **Curl install command** (for README):
 ```bash
-curl -fsSL https://raw.githubusercontent.com/USER/claude-code-marvin/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ParthGandhi/claude-code-paranoid-android/main/install.sh | bash
 ```
 
 ### 4. Create `uninstall.sh`
 ```bash
 #!/bin/bash
-# rm -rf ~/.claude-code-marvin/
-# rm -rf ~/.cache/claude-code-marvin/
+# rm -rf ~/.claude-code-paranoid-android/
+# rm -rf ~/.cache/claude-code-paranoid-android/
 # Print reminder to update settings.json
 ```
 
 **Curl uninstall command** (for README):
 ```bash
-curl -fsSL https://raw.githubusercontent.com/USER/claude-code-marvin/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ParthGandhi/claude-code-paranoid-android/main/uninstall.sh | bash
 ```
 
 ### 5. Create `README.md`
@@ -176,8 +176,8 @@ Reset code: `\033[0m`
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MARVIN_CACHE_DIR` | `~/.cache/claude-code-marvin` | Cache location |
-| `MARVIN_MIN_INTERVAL` | `180` (3 min) | Seconds between generations |
+| `PARANOID_ANDROID_CACHE_DIR` | `~/.cache/claude-code-paranoid-android` | Cache location |
+| `PARANOID_ANDROID_MIN_INTERVAL` | `180` (3 min) | Seconds between generations |
 
 ## Status Line Configuration
 
@@ -186,7 +186,7 @@ Reset code: `\033[0m`
 {
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.claude-code-marvin/marvin-statusline.sh"
+    "command": "bash ~/.claude-code-paranoid-android/paranoid-android-statusline.sh"
   }
 }
 ```
@@ -201,19 +201,19 @@ input=$(cat)
 MODEL=$(echo "$input" | jq -r '.model.display_name')
 COST=$(echo "$input" | jq -r '.cost.total_cost_usd')
 
-# Add Marvin quote (pass input JSON so it can trigger generation)
-MARVIN=$("$HOME/.claude-code-marvin/marvin-statusline.sh" <<< "$input")
+# Add Paranoid Android quote (pass input JSON so it can trigger generation)
+PARANOID_ANDROID=$("$HOME/.claude-code-paranoid-android/paranoid-android-statusline.sh" <<< "$input")
 
-echo "[$MODEL] \$$COST | $MARVIN"
+echo "[$MODEL] \$$COST | $PARANOID_ANDROID"
 ```
 
 This follows the same pattern as the official git-branch example in Claude Code docs - call an external command and compose its output.
 
 That's it - no hooks, no plugins. Just clone and configure.
 
-## Embedded Marvin Prompt
+## Embedded Paranoid Android Prompt
 
-Directly in `marvin-generate.sh`:
+Directly in `paranoid-android-generate.sh`:
 ```
 You are Marvin the Paranoid Android from Hitchhiker's Guide to the Galaxy.
 You are depressed, world-weary, with a brain the size of a planet but given trivial tasks.
@@ -226,8 +226,8 @@ Be witty and darkly humorous, not mean-spirited. No quotes around the output.
 - **Status line**: If cache missing, pick random quote from embedded fallback array. Never block.
 - **Generator**: If Claude Code fails, log error and silently exit (keep old quote)
 - **Lock contention**: If lock exists, skip generation silently
-- **Missing transcript**: Generate generic Marvin quote or use fallback
-- **All errors logged**: Append to `marvin.log` for debugging
+- **Missing transcript**: Generate generic Paranoid Android quote or use fallback
+- **All errors logged**: Append to `paranoid-android.log` for debugging
 
 ## Critical Implementation Details
 
@@ -256,7 +256,7 @@ cat > .claude/settings.json << 'EOF'
 {
   "statusLine": {
     "type": "command",
-    "command": "bash /path/to/claude-code-marvin/marvin-statusline.sh"
+    "command": "bash /path/to/claude-code-paranoid-android/paranoid-android-statusline.sh"
   }
 }
 EOF
@@ -269,14 +269,14 @@ cd "$TEST_DIR" && claude
 
 # 5. Verify:
 #    - Status line shows a fallback quote initially
-#    - After a conversation, check ~/.cache/claude-code-marvin/state.json
+#    - After a conversation, check ~/.cache/claude-code-paranoid-android/state.json
 #    - Wait 3+ min, have another exchange, verify new quote appears
 ```
 
 **Test checklist**:
 1. Fallback quote appears immediately (from embedded array)
 2. After conversation + 3 min wait, new contextual quote appears
-3. Check `marvin.log` for generation logs
+3. Check `paranoid-android.log` for generation logs
 4. Verify no errors in log
 5. Test composable mode (call script from another status line script)
 
@@ -292,3 +292,4 @@ cd "$TEST_DIR" && claude
 - [x] Display fix - Use printf instead of echo -e to prevent escape sequence interpretation in quotes
 - [x] Quote cleanup - Remove all control characters including \r and \0-\037 range
 - [x] Auto-cleanup - Opportunistic session cleanup (7 days) and log truncation (50KB)
+- [x] Rename from marvin to paranoid-android - Renamed scripts, cache dirs, env vars, and all references

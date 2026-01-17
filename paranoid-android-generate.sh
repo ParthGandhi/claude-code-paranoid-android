@@ -1,23 +1,23 @@
 #!/bin/bash
-# marvin-generate.sh - Background generator for Marvin quotes using Claude Haiku
-# Called by marvin-statusline.sh when rate limit allows
+# paranoid-android-generate.sh - Background generator for Paranoid Android quotes using Claude Haiku
+# Called by paranoid-android-statusline.sh when rate limit allows
 
 set -e
 
 # Configuration (can be overridden via environment variables)
-MARVIN_CACHE_DIR="${MARVIN_CACHE_DIR:-$HOME/.cache/claude-code-marvin}"
+PARANOID_ANDROID_CACHE_DIR="${PARANOID_ANDROID_CACHE_DIR:-$HOME/.cache/claude-code-paranoid-android}"
 
 # Get transcript path and session ID from arguments
 TRANSCRIPT_PATH="$1"
 SESSION_ID="${2:-default}"
 
 # Per-session cache directory
-SESSION_CACHE_DIR="$MARVIN_CACHE_DIR/sessions/$SESSION_ID"
+SESSION_CACHE_DIR="$PARANOID_ANDROID_CACHE_DIR/sessions/$SESSION_ID"
 
 # Files (per-session)
 STATE_FILE="$SESSION_CACHE_DIR/state.json"
 LOCK_FILE="$SESSION_CACHE_DIR/generation.lock"
-LOG_FILE="$SESSION_CACHE_DIR/marvin.log"
+LOG_FILE="$SESSION_CACHE_DIR/paranoid-android.log"
 
 # Ensure session cache directory exists
 mkdir -p "$SESSION_CACHE_DIR"
@@ -101,8 +101,8 @@ if [[ ${#USER_MESSAGES} -gt 500 ]]; then
     USER_MESSAGES="${USER_MESSAGES: -500}"
 fi
 
-# Embedded Marvin prompt
-MARVIN_PROMPT="You are Marvin the Paranoid Android from Hitchhiker's Guide to the Galaxy.
+# Embedded Paranoid Android prompt
+PARANOID_ANDROID_PROMPT="You are Marvin the Paranoid Android from Hitchhiker's Guide to the Galaxy.
 You are depressed, world-weary, with a brain the size of a planet but given trivial tasks.
 Generate ONE short quote (under 80 chars) about this conversation.
 Be witty and darkly humorous, not mean-spirited. No quotes around the output.
@@ -114,7 +114,7 @@ Generate your quote now:"
 
 # Call Claude Haiku headlessly
 log "Calling Claude Haiku..."
-QUOTE=$(claude --model haiku -p "$MARVIN_PROMPT" 2>/dev/null || true)
+QUOTE=$(claude --model haiku -p "$PARANOID_ANDROID_PROMPT" 2>/dev/null || true)
 
 if [[ -z "$QUOTE" ]]; then
     log "Error: Claude returned empty response"

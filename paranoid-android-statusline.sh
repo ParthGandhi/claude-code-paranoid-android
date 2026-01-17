@@ -1,12 +1,12 @@
 #!/bin/bash
-# marvin-statusline.sh - Main entry point for Marvin the Paranoid Android status line
+# paranoid-android-statusline.sh - Main entry point for Paranoid Android status line
 # Displays cached quote and triggers background generation when rate limit allows
 
 set -e
 
 # Configuration (can be overridden via environment variables)
-MARVIN_CACHE_DIR="${MARVIN_CACHE_DIR:-$HOME/.cache/claude-code-marvin}"
-MARVIN_MIN_INTERVAL="${MARVIN_MIN_INTERVAL:-180}" # 3 minutes default
+PARANOID_ANDROID_CACHE_DIR="${PARANOID_ANDROID_CACHE_DIR:-$HOME/.cache/claude-code-paranoid-android}"
+PARANOID_ANDROID_MIN_INTERVAL="${PARANOID_ANDROID_MIN_INTERVAL:-180}" # 3 minutes default
 
 # ANSI styling: dim cyan italic
 STYLE_START='\033[2;3;36m'
@@ -28,7 +28,7 @@ FALLBACK_QUOTES=(
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Ensure cache directory exists
-mkdir -p "$MARVIN_CACHE_DIR"
+mkdir -p "$PARANOID_ANDROID_CACHE_DIR"
 
 # Read JSON input from stdin
 INPUT=$(cat)
@@ -42,12 +42,12 @@ if [[ -n "$TRANSCRIPT_PATH" ]]; then
 else
     SESSION_ID="default"
 fi
-SESSION_CACHE_DIR="$MARVIN_CACHE_DIR/sessions/$SESSION_ID"
+SESSION_CACHE_DIR="$PARANOID_ANDROID_CACHE_DIR/sessions/$SESSION_ID"
 mkdir -p "$SESSION_CACHE_DIR"
 
 # Opportunistic cleanup: ~1% of calls, runs in background
 if [[ $((RANDOM % 100)) -eq 0 ]]; then
-    find "$MARVIN_CACHE_DIR/sessions" -type d -mtime +7 -mindepth 1 -maxdepth 1 -exec rm -rf {} + 2>/dev/null &
+    find "$PARANOID_ANDROID_CACHE_DIR/sessions" -type d -mtime +7 -mindepth 1 -maxdepth 1 -exec rm -rf {} + 2>/dev/null &
 fi
 
 # Function to get a random fallback quote
@@ -97,7 +97,7 @@ should_generate() {
         generated_at=$(jq -r '.generated_at // 0' "$state_file" 2>/dev/null || echo "0")
         local elapsed=$((current_time - generated_at))
 
-        if [[ $elapsed -lt $MARVIN_MIN_INTERVAL ]]; then
+        if [[ $elapsed -lt $PARANOID_ANDROID_MIN_INTERVAL ]]; then
             return 1
         fi
     fi
@@ -107,7 +107,7 @@ should_generate() {
 
 # Function to spawn generator in background
 spawn_generator() {
-    local generator_script="$SCRIPT_DIR/marvin-generate.sh"
+    local generator_script="$SCRIPT_DIR/paranoid-android-generate.sh"
 
     if [[ -x "$generator_script" ]]; then
         # Spawn in background with nohup, redirect all output

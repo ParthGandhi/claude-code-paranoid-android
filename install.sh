@@ -1,13 +1,13 @@
 #!/bin/bash
-# install.sh - Installer for Claude Code Marvin status line
+# install.sh - Installer for Claude Code Paranoid Android status line
 # Usage: curl -fsSL https://raw.githubusercontent.com/ParthGandhi/claude-code-paranoid-android/main/install.sh | bash
 
 set -e
 
-INSTALL_DIR="$HOME/.claude-code-marvin"
+INSTALL_DIR="$HOME/.claude-code-paranoid-android"
 REPO_URL="https://github.com/ParthGandhi/claude-code-paranoid-android"
 
-echo "Installing Claude Code Marvin..."
+echo "Installing Claude Code Paranoid Android..."
 echo ""
 
 # Check for required dependencies
@@ -37,21 +37,21 @@ git clone --depth 1 "$REPO_URL" "$INSTALL_DIR" 2>/dev/null || {
 }
 
 # Make scripts executable
-chmod +x "$INSTALL_DIR/marvin-statusline.sh"
-chmod +x "$INSTALL_DIR/marvin-generate.sh"
+chmod +x "$INSTALL_DIR/paranoid-android-statusline.sh"
+chmod +x "$INSTALL_DIR/paranoid-android-generate.sh"
 
 # Create cache directory
-mkdir -p "$HOME/.cache/claude-code-marvin"
+mkdir -p "$HOME/.cache/claude-code-paranoid-android"
 
 echo ""
 echo "Installation complete!"
 echo ""
-echo "To enable Marvin quotes, add this to your ~/.claude/settings.json:"
+echo "To enable Paranoid Android quotes, add this to your ~/.claude/settings.json:"
 echo ""
 echo '  {'
 echo '    "statusLine": {'
 echo '      "type": "command",'
-echo '      "command": "bash ~/.claude-code-marvin/marvin-statusline.sh"'
+echo '      "command": "bash ~/.claude-code-paranoid-android/paranoid-android-statusline.sh"'
 echo '    }'
 echo '  }'
 echo ""

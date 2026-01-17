@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Claude Code Marvin is a status line extension that displays Marvin the Paranoid Android quotes. It uses a two-script architecture for non-blocking operation:
+Claude Code Paranoid Android is a status line extension that displays Marvin the Paranoid Android quotes. It uses a two-script architecture for non-blocking operation:
 
-1. **marvin-statusline.sh** - Fast display script (called every ~300ms by Claude Code)
-   - Reads cached quote from `~/.cache/claude-code-marvin/sessions/<session-id>/state.json`
+1. **paranoid-android-statusline.sh** - Fast display script (called every ~300ms by Claude Code)
+   - Reads cached quote from `~/.cache/claude-code-paranoid-android/sessions/<session-id>/state.json`
    - Falls back to embedded quotes array if no cache
    - Spawns generator in background if rate limit allows (3 min default)
 
-2. **marvin-generate.sh** - Background generator
+2. **paranoid-android-generate.sh** - Background generator
    - Extracts last 5 user messages from Claude Code's JSONL transcript
    - Calls `claude --model haiku -p "..."` to generate contextual quote
    - Writes atomically to state.json with lock file protection
@@ -38,7 +38,7 @@ cat > "$TEST_DIR/.claude/settings.json" << 'EOF'
 {
   "statusLine": {
     "type": "command",
-    "command": "bash /path/to/this/repo/marvin-statusline.sh"
+    "command": "bash /path/to/this/repo/paranoid-android-statusline.sh"
   }
 }
 EOF
@@ -48,12 +48,12 @@ cd "$TEST_DIR" && claude
 
 Test the statusline directly:
 ```bash
-echo '{"transcript_path": "/tmp/test.jsonl"}' | ./marvin-statusline.sh
+echo '{"transcript_path": "/tmp/test.jsonl"}' | ./paranoid-android-statusline.sh
 ```
 
 Check logs:
 ```bash
-cat ~/.cache/claude-code-marvin/sessions/*/marvin.log
+cat ~/.cache/claude-code-paranoid-android/sessions/*/paranoid-android.log
 ```
 
 ## Development Workflow

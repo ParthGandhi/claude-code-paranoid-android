@@ -1,13 +1,13 @@
 #!/bin/bash
-# uninstall.sh - Uninstaller for Claude Code Marvin status line
+# uninstall.sh - Uninstaller for Claude Code Paranoid Android status line
 # Usage: curl -fsSL https://raw.githubusercontent.com/ParthGandhi/claude-code-paranoid-android/main/uninstall.sh | bash
 
 set -e
 
-INSTALL_DIR="$HOME/.claude-code-marvin"
-CACHE_DIR="$HOME/.cache/claude-code-marvin"
+INSTALL_DIR="$HOME/.claude-code-paranoid-android"
+CACHE_DIR="$HOME/.cache/claude-code-paranoid-android"
 
-echo "Uninstalling Claude Code Marvin..."
+echo "Uninstalling Claude Code Paranoid Android..."
 echo ""
 
 # Remove installation directory

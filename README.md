@@ -1,4 +1,4 @@
-# Claude Code Marvin
+# Claude Code Paranoid Android
 
 > "Here I am, brain the size of a planet, and you want me to display status messages."
 
@@ -7,7 +7,7 @@ A Claude Code status line extension that displays depressed, witty Marvin the Pa
 ## Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/USER/claude-code-marvin/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ParthGandhi/claude-code-paranoid-android/main/install.sh | bash
 ```
 
 Then add to your `~/.claude/settings.json`:
@@ -16,7 +16,7 @@ Then add to your `~/.claude/settings.json`:
 {
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.claude-code-marvin/marvin-statusline.sh"
+    "command": "bash ~/.claude-code-paranoid-android/paranoid-android-statusline.sh"
   }
 }
 ```
@@ -24,7 +24,7 @@ Then add to your `~/.claude/settings.json`:
 ## Uninstallation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/USER/claude-code-marvin/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ParthGandhi/claude-code-paranoid-android/main/uninstall.sh | bash
 ```
 
 Then remove the `statusLine` section from your `~/.claude/settings.json`.
@@ -33,7 +33,7 @@ Then remove the `statusLine` section from your `~/.claude/settings.json`.
 
 1. **Status line displays cached quote** - Fast, no blocking. Falls back to embedded quotes if no cache.
 2. **Background generation** - Every 3 minutes (configurable), spawns a background process to generate a new contextual quote using Claude Haiku.
-3. **Context-aware** - Reads your recent conversation to generate relevant, Marvin-style commentary on your coding session.
+3. **Context-aware** - Reads your recent conversation to generate relevant, Paranoid Android-style commentary on your coding session.
 
 ## Configuration
 
@@ -41,8 +41,8 @@ Environment variables to customize behavior:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MARVIN_CACHE_DIR` | `~/.cache/claude-code-marvin` | Cache location |
-| `MARVIN_MIN_INTERVAL` | `180` (3 min) | Seconds between generations |
+| `PARANOID_ANDROID_CACHE_DIR` | `~/.cache/claude-code-paranoid-android` | Cache location |
+| `PARANOID_ANDROID_MIN_INTERVAL` | `180` (3 min) | Seconds between generations |
 
 ## Composable Usage
 
@@ -57,10 +57,10 @@ input=$(cat)
 MODEL=$(echo "$input" | jq -r '.model.display_name')
 COST=$(echo "$input" | jq -r '.cost.total_cost_usd')
 
-# Add Marvin quote
-MARVIN=$("$HOME/.claude-code-marvin/marvin-statusline.sh" <<< "$input")
+# Add Paranoid Android quote
+PARANOID_ANDROID=$("$HOME/.claude-code-paranoid-android/paranoid-android-statusline.sh" <<< "$input")
 
-echo "[$MODEL] \$$COST | $MARVIN"
+echo "[$MODEL] \$$COST | $PARANOID_ANDROID"
 ```
 
 ## Debugging
@@ -68,19 +68,19 @@ echo "[$MODEL] \$$COST | $MARVIN"
 Each Claude Code session gets its own cache directory. List active sessions:
 
 ```bash
-ls ~/.cache/claude-code-marvin/sessions/
+ls ~/.cache/claude-code-paranoid-android/sessions/
 ```
 
 Check a session's log file for generation history and errors:
 
 ```bash
-cat ~/.cache/claude-code-marvin/sessions/*/marvin.log
+cat ~/.cache/claude-code-paranoid-android/sessions/*/paranoid-android.log
 ```
 
 View a session's cached state:
 
 ```bash
-cat ~/.cache/claude-code-marvin/sessions/*/state.json
+cat ~/.cache/claude-code-paranoid-android/sessions/*/state.json
 ```
 
 ## Requirements
