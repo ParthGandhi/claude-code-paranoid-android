@@ -65,16 +65,22 @@ echo "[$MODEL] \$$COST | $MARVIN"
 
 ## Debugging
 
-Check the log file for generation history and errors:
+Each Claude Code session gets its own cache directory. List active sessions:
 
 ```bash
-cat ~/.cache/claude-code-marvin/marvin.log
+ls ~/.cache/claude-code-marvin/sessions/
 ```
 
-View current cached state:
+Check a session's log file for generation history and errors:
 
 ```bash
-cat ~/.cache/claude-code-marvin/state.json
+cat ~/.cache/claude-code-marvin/sessions/*/marvin.log
+```
+
+View a session's cached state:
+
+```bash
+cat ~/.cache/claude-code-marvin/sessions/*/state.json
 ```
 
 ## Requirements
@@ -82,6 +88,7 @@ cat ~/.cache/claude-code-marvin/state.json
 - [Claude Code CLI](https://claude.ai/code) installed and authenticated
 - `jq` for JSON parsing
 - `git` for installation
+- macOS or Linux (tested on macOS Sequoia 15.x only)
 
 ## License
 
