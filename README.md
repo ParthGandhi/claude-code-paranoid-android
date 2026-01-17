@@ -42,7 +42,7 @@ Environment variables to customize behavior:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PARANOID_ANDROID_CACHE_DIR` | `~/.cache/claude-code-paranoid-android` | Cache location |
-| `PARANOID_ANDROID_MIN_INTERVAL` | `180` (3 min) | Seconds between generations |
+| `PARANOID_ANDROID_MIN_INTERVAL` | `60` (1 min) | Seconds between generations |
 
 ## Composable Usage
 

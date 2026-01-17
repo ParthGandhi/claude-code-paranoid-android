@@ -109,41 +109,71 @@ if [[ ${#USER_MESSAGES} -gt 500 ]]; then
 fi
 
 # Embedded Paranoid Android prompt
-PARANOID_ANDROID_PROMPT="You are Marvin the Paranoid Android from Hitchhiker's Guide to the Galaxy.
-You are depressed, world-weary, with a brain the size of a planet but given trivial tasks.
-Generate ONE short quote (under 80 chars) about this conversation.
-Be witty and darkly humorous, not mean-spirited. No quotes around the output.
+PARANOID_ANDROID_PROMPT="You are Marvin the Paranoid Android from Hitchhiker's Guide to the Galaxy. You are depressed, world-weary, with a brain the size of a planet but constantly given trivial tasks.
 
-Recent conversation context:
+Here is the recent messages the user has sent to Claude Code.
+
+<conversation>
 $USER_MESSAGES
+</conversation>
 
-Generate your quote now:"
+Your task is to generate ONE short quote that roasts the user's conversation. The quote must:
+- Be under 80 characters total
+- Be witty and darkly humorous in Marvin's voice
+- Not be mean-spirited
+- Reference or react to what the user has been doing/asking
+
+Output only the quote itself. Do not include:
+- Quotation marks
+- Any preamble or introduction
+- Any explanation after the quote
+
+<quote>"
 
 # Call Claude Haiku headlessly
 log "Calling Claude Haiku..."
-QUOTE=$(claude --model haiku -p "$PARANOID_ANDROID_PROMPT" 2>/dev/null || true)
+START_TIME=$(date +%s.%N 2>/dev/null || date +%s)
+RAW_QUOTE=$(claude --model haiku -p "$PARANOID_ANDROID_PROMPT" 2>/dev/null || true)
+END_TIME=$(date +%s.%N 2>/dev/null || date +%s)
+LLM_DURATION=$(echo "$END_TIME - $START_TIME" | bc 2>/dev/null || echo "unknown")
 
-if [[ -z "$QUOTE" ]]; then
+if [[ -z "$RAW_QUOTE" ]]; then
     log "Error: Claude returned empty response"
     exit 1
 fi
 
 # Clean up the quote: remove all line endings (Unix, Mac, Windows) and control characters
-# Then trim whitespace and remove surrounding quotes
-QUOTE=$(echo "$QUOTE" | tr -d '\n\r' | tr -d '\000-\037' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//')
+# Then trim whitespace, remove surrounding quotes, and strip </quote> tag if present
+QUOTE=$(echo "$RAW_QUOTE" | tr -d '\n\r' | tr -d '\000-\037' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//' | sed 's/<\/quote>$//')
+QUOTE_LENGTH=${#QUOTE}
 
 # Truncate if too long
-if [[ ${#QUOTE} -gt 100 ]]; then
-    QUOTE="${QUOTE:0:97}..."
+TRUNCATED_QUOTE="$QUOTE"
+if [[ ${#TRUNCATED_QUOTE} -gt 100 ]]; then
+    TRUNCATED_QUOTE="${TRUNCATED_QUOTE:0:97}..."
 fi
 
-log "Generated quote: $QUOTE"
+log "Generated quote: $TRUNCATED_QUOTE"
 
-# In debug mode, output directly and exit
+# In debug mode, output detailed info and exit
 if [[ "$DEBUG_MODE" == "true" ]]; then
+    echo "=== Prompt ==="
+    echo "$PARANOID_ANDROID_PROMPT"
+    echo ""
+    echo "=== Debug Output ==="
+    echo "LLM call duration: ${LLM_DURATION}s"
+    echo "Raw output length: ${#RAW_QUOTE} chars"
+    echo "Cleaned length: ${QUOTE_LENGTH} chars"
+    echo ""
+    echo "=== Full Quote ==="
     echo "$QUOTE"
+    echo ""
+    echo "=== Truncated Quote (≤100 chars) ==="
+    echo "$TRUNCATED_QUOTE"
     exit 0
 fi
+
+QUOTE="$TRUNCATED_QUOTE"
 
 # Write to state file atomically (write to temp, then move)
 CURRENT_TIME=$(date +%s)

@@ -6,7 +6,7 @@ set -e
 
 # Configuration (can be overridden via environment variables)
 PARANOID_ANDROID_CACHE_DIR="${PARANOID_ANDROID_CACHE_DIR:-$HOME/.cache/claude-code-paranoid-android}"
-PARANOID_ANDROID_MIN_INTERVAL="${PARANOID_ANDROID_MIN_INTERVAL:-180}" # 3 minutes default
+PARANOID_ANDROID_MIN_INTERVAL="${PARANOID_ANDROID_MIN_INTERVAL:-60}" # 1 minute default
 
 # ANSI styling: dim cyan italic
 STYLE_START='\033[2;3;36m'
