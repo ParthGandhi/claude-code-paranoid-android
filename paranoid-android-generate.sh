@@ -4,6 +4,13 @@
 
 set -e
 
+# Debug mode: --debug <transcript_path>
+DEBUG_MODE=false
+if [[ "${1:-}" == "--debug" ]]; then
+    DEBUG_MODE=true
+    shift
+fi
+
 # Configuration (can be overridden via environment variables)
 PARANOID_ANDROID_CACHE_DIR="${PARANOID_ANDROID_CACHE_DIR:-$HOME/.cache/claude-code-paranoid-android}"
 
@@ -19,26 +26,34 @@ STATE_FILE="$SESSION_CACHE_DIR/state.json"
 LOCK_FILE="$SESSION_CACHE_DIR/generation.lock"
 LOG_FILE="$SESSION_CACHE_DIR/paranoid-android.log"
 
-# Ensure session cache directory exists
-mkdir -p "$SESSION_CACHE_DIR"
-
-# Truncate log if over 50KB (keep last 500 lines)
-if [[ -f "$LOG_FILE" ]] && [[ $(stat -f%z "$LOG_FILE" 2>/dev/null || stat -c%s "$LOG_FILE" 2>/dev/null || echo 0) -gt 51200 ]]; then
-    tail -n 500 "$LOG_FILE" >"$LOG_FILE.tmp" && mv "$LOG_FILE.tmp" "$LOG_FILE"
-fi
-
-# Logging function
+# Logging function (no-op in debug mode)
 log() {
+    if [[ "$DEBUG_MODE" == "true" ]]; then
+        return
+    fi
     local timestamp
     timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     echo "[$timestamp] $1" >>"$LOG_FILE"
 }
 
-# Cleanup function to remove lock on exit
+# Cleanup function to remove lock on exit (no-op in debug mode)
 cleanup() {
-    rm -f "$LOCK_FILE"
+    if [[ "$DEBUG_MODE" != "true" ]]; then
+        rm -f "$LOCK_FILE"
+    fi
 }
 trap cleanup EXIT
+
+# Skip cache setup in debug mode
+if [[ "$DEBUG_MODE" != "true" ]]; then
+    # Ensure session cache directory exists
+    mkdir -p "$SESSION_CACHE_DIR"
+
+    # Truncate log if over 50KB (keep last 500 lines)
+    if [[ -f "$LOG_FILE" ]] && [[ $(stat -f%z "$LOG_FILE" 2>/dev/null || stat -c%s "$LOG_FILE" 2>/dev/null || echo 0) -gt 51200 ]]; then
+        tail -n 500 "$LOG_FILE" >"$LOG_FILE.tmp" && mv "$LOG_FILE.tmp" "$LOG_FILE"
+    fi
+fi
 
 if [[ -z "$TRANSCRIPT_PATH" ]]; then
     log "Error: No transcript path provided"
@@ -50,43 +65,35 @@ if [[ ! -f "$TRANSCRIPT_PATH" ]]; then
     exit 1
 fi
 
-# Check if lock already exists (another generation in progress)
-if [[ -f "$LOCK_FILE" ]]; then
-    log "Skipped: Generation already in progress (lock exists)"
-    exit 0
-fi
+# Skip lock handling in debug mode
+if [[ "$DEBUG_MODE" != "true" ]]; then
+    # Check if lock already exists (another generation in progress)
+    if [[ -f "$LOCK_FILE" ]]; then
+        log "Skipped: Generation already in progress (lock exists)"
+        exit 0
+    fi
 
-# Create lock file
-echo $$ >"$LOCK_FILE"
+    # Create lock file
+    echo $$ >"$LOCK_FILE"
+fi
 
 log "Starting generation (session: $SESSION_ID) from transcript: $TRANSCRIPT_PATH"
 
 # Extract last ~5 user messages from JSONL transcript
 # User messages have "role":"user" and content can be string or array
+# Only extract string content (actual user-typed messages), filter meta/command messages
 extract_user_messages() {
     local transcript="$1"
-    local messages=""
 
-    # Parse JSONL, extract user messages, get the text content
-    # Handle both string content and array content blocks
-    messages=$(grep '"role":"user"' "$transcript" 2>/dev/null | tail -5 | while read -r line; do
-        # Try to extract content - handle both string and array formats
-        content=$(echo "$line" | jq -r '
-            if .content | type == "string" then
-                .content
-            elif .content | type == "array" then
-                [.content[] | select(.type == "text") | .text] | join(" ")
-            else
-                ""
-            end
-        ' 2>/dev/null || true)
-
-        if [[ -n "$content" && "$content" != "null" ]]; then
-            echo "$content"
-        fi
-    done)
-
-    echo "$messages"
+    # Extract string-content user messages, filter meta/commands, take last 5
+    # .message.content contains the actual user input
+    grep '"role":"user"' "$transcript" 2>/dev/null | jq -r '
+        if .message.content | type == "string" then
+            .message.content
+        else
+            ""
+        end
+    ' 2>/dev/null | grep -v '^$' | grep -v '<command' | grep -v '^Caveat' | tail -5
 }
 
 USER_MESSAGES=$(extract_user_messages "$TRANSCRIPT_PATH")
@@ -131,6 +138,12 @@ if [[ ${#QUOTE} -gt 100 ]]; then
 fi
 
 log "Generated quote: $QUOTE"
+
+# In debug mode, output directly and exit
+if [[ "$DEBUG_MODE" == "true" ]]; then
+    echo "$QUOTE"
+    exit 0
+fi
 
 # Write to state file atomically (write to temp, then move)
 CURRENT_TIME=$(date +%s)

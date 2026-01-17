@@ -293,3 +293,5 @@ cd "$TEST_DIR" && claude
 - [x] Quote cleanup - Remove all control characters including \r and \0-\037 range
 - [x] Auto-cleanup - Opportunistic session cleanup (7 days) and log truncation (50KB)
 - [x] Rename from marvin to paranoid-android - Renamed scripts, cache dirs, env vars, and all references
+- [x] Fix message extraction - Extract only string content, filter meta messages, improve context quality
+- [x] Add --debug flag - Local debugging mode that outputs quote directly without lock/state files
