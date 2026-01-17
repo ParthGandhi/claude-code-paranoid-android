@@ -17,5 +17,5 @@ generation.lock
 /tmp/
 /test-*/
 
-# Claude Code local settings (users should use their own)
-.claude/settings.local.json
+# Claude Code local settings (contains machine-specific paths)
+.claude/settings.json
