@@ -3,7 +3,21 @@
 > "Here I am, brain the size of a planet, and you want me to display status messages."
 
 Give your [Claude Code status line](https://docs.anthropic.com/en/docs/claude-code/settings#status-line) a personality.
-<img width="1066" height="219" alt="Screenshot 2026-01-17 at 10 25 14 AM" src="https://github.com/user-attachments/assets/d321c08b-31aa-4340-a2c7-8035c1ad3767" />
+<img width="1066" height="219" alt="Screenshot" src="https://github.com/user-attachments/assets/d321c08b-31aa-4340-a2c7-8035c1ad3767" />
+
+### Example Quotes
+
+> "I've calculated the probability of `private: true` improving your life. The result is classified as a decimal number."
+
+> "Repository not found, yet my depression remains perfectly documented."
+
+> "A brain the size of a planet, and you can't figure out relative paths. Life. Don't talk to me about life."
+
+> "Ah yes, commit and push, debug flags, session paths... Such stimulating work for a brain the size of a planet."
+
+> "I suppose you'll want me to read files and run tests next. How delightful."
+
+> "I suppose being asked to generate a quote about generating quotes is what passes for irony these days."
 
 ## Installation
 
