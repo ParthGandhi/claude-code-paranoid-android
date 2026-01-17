@@ -1,6 +1,6 @@
 #!/bin/bash
 # uninstall.sh - Uninstaller for Claude Code Marvin status line
-# Usage: curl -fsSL https://raw.githubusercontent.com/USER/claude-code-marvin/main/uninstall.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/ParthGandhi/claude-code-paranoid-android/main/uninstall.sh | bash
 
 set -e
 

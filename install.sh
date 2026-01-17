@@ -1,11 +1,11 @@
 #!/bin/bash
 # install.sh - Installer for Claude Code Marvin status line
-# Usage: curl -fsSL https://raw.githubusercontent.com/USER/claude-code-marvin/main/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/ParthGandhi/claude-code-paranoid-android/main/install.sh | bash
 
 set -e
 
 INSTALL_DIR="$HOME/.claude-code-marvin"
-REPO_URL="https://github.com/USER/claude-code-marvin"
+REPO_URL="https://github.com/ParthGandhi/claude-code-paranoid-android"
 
 echo "Installing Claude Code Marvin..."
 echo ""
