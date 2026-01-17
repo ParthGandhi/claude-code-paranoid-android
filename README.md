@@ -49,11 +49,30 @@ curl -fsSL https://raw.githubusercontent.com/ParthGandhi/claude-code-paranoid-an
 
 Then remove the `statusLine` section from your `~/.claude/settings.json`.
 
-## How It Works
+## Architecture
 
-1. **Status line displays cached quote** - Fast, no blocking. Falls back to embedded quotes if no cache.
-2. **Background generation** - Every minute (configurable), spawns a background process to generate a new contextual quote using Claude Haiku.
-3. **Context-aware** - Reads your recent conversation to generate relevant, Marvin-style commentary on your coding session.
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     Status Line Script                          │
+│  1. Read cached quote from file                                 │
+│  2. Display quote                                               │
+│  3. If rate limit allows, spawn generator in background         │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ spawns (if rate limit allows)
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     Generator Script                            │
+│  1. Read transcript_path from stdin JSON                        │
+│  2. Extract last few user messages                              │
+│  3. Call `claude --model haiku -p "..."` headless               │
+│  4. Write new quote to cache file                               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+The status line receives JSON with `transcript_path` every ~300ms. We use this to:
+1. Always display the cached quote (fast, non-blocking)
+2. Opportunistically spawn the generator in background when rate limit allows
 
 ## Configuration
 
