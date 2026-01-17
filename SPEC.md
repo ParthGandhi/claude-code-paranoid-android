@@ -265,3 +265,12 @@ cd "$TEST_DIR" && claude
 3. Check `marvin.log` for generation logs
 4. Verify no errors in log
 5. Test composable mode (call script from another status line script)
+
+## Implementation Tasklist
+
+- [x] Create `marvin-statusline.sh` - Main entry point with cached quote display and background generation trigger
+- [x] Create `marvin-generate.sh` - Background generator using Claude Code headless
+- [x] Create `install.sh` - Installer script for curl-based installation
+- [x] Create `uninstall.sh` - Clean removal script
+- [x] Create `README.md` - Documentation with install/uninstall commands and usage
+- [x] Create `LICENSE` - MIT license
