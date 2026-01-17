@@ -62,6 +62,10 @@ sessions/
 
 **Per-session isolation**: Each Claude Code instance has a unique `transcript_path`. We derive a 12-character session ID from its MD5 hash to create isolated cache directories. This prevents race conditions when multiple Claude instances run simultaneously.
 
+**Automatic cleanup**:
+- Session directories older than 7 days are deleted opportunistically (~1% of status line calls)
+- Log files are truncated to 500 lines when they exceed 50KB
+
 ## Implementation Steps
 
 ### 1. Create `marvin-statusline.sh`
@@ -287,3 +291,4 @@ cd "$TEST_DIR" && claude
 - [x] Per-session isolation - Derive session ID from transcript_path, create per-session cache directories
 - [x] Display fix - Use printf instead of echo -e to prevent escape sequence interpretation in quotes
 - [x] Quote cleanup - Remove all control characters including \r and \0-\037 range
+- [x] Auto-cleanup - Opportunistic session cleanup (7 days) and log truncation (50KB)

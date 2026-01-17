@@ -22,6 +22,11 @@ LOG_FILE="$SESSION_CACHE_DIR/marvin.log"
 # Ensure session cache directory exists
 mkdir -p "$SESSION_CACHE_DIR"
 
+# Truncate log if over 50KB (keep last 500 lines)
+if [[ -f "$LOG_FILE" ]] && [[ $(stat -f%z "$LOG_FILE" 2>/dev/null || stat -c%s "$LOG_FILE" 2>/dev/null || echo 0) -gt 51200 ]]; then
+    tail -n 500 "$LOG_FILE" >"$LOG_FILE.tmp" && mv "$LOG_FILE.tmp" "$LOG_FILE"
+fi
+
 # Logging function
 log() {
     local timestamp

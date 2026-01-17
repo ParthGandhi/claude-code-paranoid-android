@@ -45,6 +45,11 @@ fi
 SESSION_CACHE_DIR="$MARVIN_CACHE_DIR/sessions/$SESSION_ID"
 mkdir -p "$SESSION_CACHE_DIR"
 
+# Opportunistic cleanup: ~1% of calls, runs in background
+if [[ $((RANDOM % 100)) -eq 0 ]]; then
+    find "$MARVIN_CACHE_DIR/sessions" -type d -mtime +7 -mindepth 1 -maxdepth 1 -exec rm -rf {} + 2>/dev/null &
+fi
+
 # Function to get a random fallback quote
 get_fallback_quote() {
     local idx=$((RANDOM % ${#FALLBACK_QUOTES[@]}))
