@@ -2,7 +2,7 @@
 
 > "Here I am, brain the size of a planet, and you want me to display status messages."
 
-Give your [Claude Code status line](https://docs.anthropic.com/en/docs/claude-code/settings#status-line) a personality.
+Give your [Claude Code status line](https://docs.anthropic.com/en/docs/claude-code/settings#status-line) a personality. Paranoid Android displays short, context-aware Marvin-style quotes generated from your recent Claude Code conversation without slowing down the status line.
 <img width="1066" height="219" alt="Screenshot" src="https://github.com/user-attachments/assets/d321c08b-31aa-4340-a2c7-8035c1ad3767" />
 
 ### Example Quotes
@@ -21,6 +21,13 @@ Give your [Claude Code status line](https://docs.anthropic.com/en/docs/claude-co
 
 ### Installation
 
+Requirements:
+
+- [Claude Code CLI](https://claude.ai/code) installed and authenticated
+- `git` for installation
+- `jq` for JSON parsing
+- macOS or Linux
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ParthGandhi/claude-code-paranoid-android/main/install.sh | bash
 ```
@@ -34,6 +41,12 @@ Then add to your `~/.claude/settings.json`:
     "command": "bash ~/.claude-code-paranoid-android/statusline.sh"
   }
 }
+```
+
+Verify the status line script directly:
+
+```bash
+echo '{"transcript_path": "/tmp/test.jsonl"}' | ~/.claude-code-paranoid-android/statusline.sh
 ```
 
 #### Composable Usage
@@ -68,7 +81,7 @@ Then remove the `statusLine` section from your `~/.claude/settings.json`.
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Status Line Script                          │
-│  1. Read cached quote from file                                 │
+│  1. Read transcript_path from Claude Code status-line JSON      │
 │  2. Display quote                                               │
 │  3. If rate limit allows, spawn generator in background         │
 └─────────────────────────────────────────────────────────────────┘
@@ -77,10 +90,10 @@ Then remove the `statusLine` section from your `~/.claude/settings.json`.
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Generator Script                            │
-│  1. Read transcript_path from stdin JSON                        │
+│  1. Receive transcript path and session ID as arguments         │
 │  2. Extract last few user messages                              │
 │  3. Call `claude --model haiku -p "..."` headless               │
-│  4. Write new quote to cache file                               │
+│  4. Write new quote to the session cache                        │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -88,11 +101,25 @@ The status line receives JSON with `transcript_path` every ~300ms. We use this t
 1. Always display the cached quote (fast, non-blocking)
 2. Opportunistically spawn the generator in background when rate limit allows
 
+Each Claude Code session gets its own cache directory based on the transcript path:
+
+```text
+~/.cache/claude-code-paranoid-android/
+└── sessions/
+    ├── <session-id>/
+    │   ├── state.json
+    │   ├── generation.lock
+    │   └── paranoid-android.log
+    └── default/
+```
+
+Session isolation prevents multiple Claude Code windows from racing over the same cached quote. Old session directories are cleaned up opportunistically after 7 days, and log files are trimmed when they grow too large.
+
 ### Configuration
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PARANOID_ANDROID_CACHE_DIR` | `~/.cache/claude-code-paranoid-android` | Cache location |
+| `PARANOID_ANDROID_CACHE_DIR` | `~/.cache/claude-code-paranoid-android` | Cache and log location |
 | `PARANOID_ANDROID_MIN_INTERVAL` | `60` (1 min) | Seconds between generations |
 
 ### Debugging
@@ -105,8 +132,6 @@ Test quote generation directly with debug mode:
 
 This outputs the full prompt, timing info, and both raw and truncated quotes.
 
-Each Claude Code session gets its own cache directory:
-
 ```bash
 # List active sessions
 ls ~/.cache/claude-code-paranoid-android/sessions/
@@ -117,9 +142,3 @@ cat ~/.cache/claude-code-paranoid-android/sessions/*/paranoid-android.log
 # View cached state
 cat ~/.cache/claude-code-paranoid-android/sessions/*/state.json
 ```
-
-### Requirements
-
-- [Claude Code CLI](https://claude.ai/code) installed and authenticated
-- `jq` for JSON parsing
-- macOS or Linux
