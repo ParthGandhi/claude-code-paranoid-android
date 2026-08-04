@@ -36,6 +36,10 @@ Then add to your `~/.claude/settings.json`:
 }
 ```
 
+### Run
+
+Start Claude Code from any project directory with `claude` after saving the status line configuration. The configured `statusline.sh` script runs automatically and displays Paranoid Android quotes in the status line.
+
 #### Composable Usage
 
 Already have a status line? Integrate Paranoid Android with your existing script:
